@@ -121,7 +121,7 @@ if(!$_GET["id"]){
     echo json_encode($singleMobObj);
 
     // DELETE/slet mob
-    if ($_SERVER['REQUEST_METHOD'] == "DELETE") {
+    if ($_SERVER['REQUEST_METHOD'] == "DELETE" && $headers["x-mineapi-key"] == "050206") {
         $sql = "DELETE FROM mobs WHERE id = :id";
         $stmt = $dbh->prepare($sql);
         $stmt->bindParam("id", $_GET["id"], PDO::PARAM_INT);
