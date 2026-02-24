@@ -1,9 +1,10 @@
 <?php
 
+$headers = apache_request_headers();
 require_once("./db.php");
 
 // POST/Add a new mob
-if($_POST){
+if($_POST && $headers["x-mineapi-key"] == "050206"){
     $postsql = "INSERT INTO mobs (name, nature, spawning, general_behavior, drops, version_release, release_date) VALUES(:name, :nature, :spawning, :general_behavior, :drops, :version_release, :release_date)";
 
     $stmt = $dbh->prepare($postsql);
@@ -50,19 +51,43 @@ header("Content-Type:application/json");
 if(!$_GET["id"]){
     echo json_encode($obj);
 } else {
-    // PUT/edit a mob
-    if ($_SERVER['REQUEST_METHOD'] == "PUT") {
-        parse_str(file_get_contents('php://input'), $_PUT);
-        $sql = "UPDATE mobs SET name = :name, nature = :nature, spawning = :spawning, general_behavior = :general_behavior, drops = :drops, version_release = :version_release, release_date = :release_date WHERE id = :id";
+    // PATCH/edit a mob
+    if ($_SERVER['REQUEST_METHOD'] == "PATCH" && $headers["x-mineapi-key"] == "050206") {
+        parse_str(file_get_contents('php://input'), $_PATCH);
+        $sql = "UPDATE mobs SET ";
+        foreach($_PATCH as $key => $value){
+            $sql .= "$key = :$key";
+            if(end($_PATCH) != $value){
+                $sql .= ", ";
+            }
+        }
+        $sql .= " WHERE id = :id";
+
         $stmt = $dbh->prepare($sql);
         $stmt->bindParam("id", $_GET["id"], PDO::PARAM_INT);
-        $stmt->bindParam("name", $_PUT["name"]);
-        $stmt->bindParam("nature", $_PUT["nature"], PDO::PARAM_INT);
-        $stmt->bindParam("spawning", $_PUT["spawning"]);
-        $stmt->bindParam("general_behavior", $_PUT["general_behavior"]);
-        $stmt->bindParam("drops", $_PUT["drops"]);
-        $stmt->bindParam("version_release", $_PUT["version_release"]);
-        $stmt->bindParam("release_date", $_PUT["release_date"]);
+        foreach($_PATCH as $key => $value){
+            if($key == "name"){
+                $stmt->bindParam("$key", $_PATCH["$key"]);
+            }
+            if($key == "nature"){
+                $stmt->bindParam("$key", $_PATCH["$key"], PDO::PARAM_INT);
+            }
+            if($key == "spawning"){
+                $stmt->bindParam("$key", $_PATCH["$key"]);
+            }
+            if($key == "general_behavior"){
+                $stmt->bindParam("$key", $_PATCH["$key"]);
+            }
+            if($key == "drops"){
+                $stmt->bindParam("$key", $_PATCH["$key"]);
+            }
+            if($key == "version_release"){
+                $stmt->bindParam("$key", $_PATCH["$key"]);
+            }
+            if($key == "release_date"){
+                $stmt->bindParam("$key", $_PATCH["$key"]);
+            }
+        }
 
         $stmt->execute();
     }

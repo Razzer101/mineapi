@@ -2,7 +2,7 @@
 
 require_once("./db.php");
 
-if($_POST){
+if($_POST && $headers["x-mineapi-key"] == "050206"){
     $sql = "INSERT INTO mob_variant (mob_id, variant_id) VALUES(:mob_id, :variant_id)";
 
     $stmt = $dbh->prepare($sql);
