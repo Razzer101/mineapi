@@ -1,5 +1,6 @@
 <?php
 
+$headers = apache_request_headers();
 require_once("./db.php");
 
 if($_POST && $headers["x-mineapi-key"] == "050206"){
