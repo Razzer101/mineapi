@@ -94,7 +94,7 @@ if(!$_GET["id"]){
 
     // GET one mob
     $singleMobResult = $dbh->query("SELECT mobs.name, natures.title as nature, mobs.spawning, mobs.general_behavior, mobs.drops, mobs.version_release, mobs.release_date FROM mobs INNER JOIN natures on natures.id = mobs.nature WHERE mobs.id = $_GET[id]");
-    $singleMob = $singleMobResult -> fetchAll(PDO::FETCH_ASSOC);
+    $singleMob = $singleMobResult -> fetch(PDO::FETCH_ASSOC);
 
     $tagsResult = $dbh->query("SELECT entity_tags.tag as tag_name, entity_tags.info FROM mobs JOIN mob_entity_tag ON mob_entity_tag.mob_id = mobs.id JOIN entity_tags ON entity_tags.id = mob_entity_tag.entity_tag_id WHERE mobs.id = $_GET[id]");
     $tags = $tagsResult -> fetchAll(PDO::FETCH_ASSOC);
@@ -102,19 +102,24 @@ if(!$_GET["id"]){
     $variantsResult = $dbh->query("SELECT variants.name as variant_name FROM mobs JOIN mob_variant ON mob_variant.mob_id = mobs.id JOIN variants ON variants.id = mob_variant.variant_id WHERE mobs.id = $_GET[id]");
     $variants = $variantsResult -> fetchAll(PDO::FETCH_ASSOC);
 
-    foreach($singleMob as &$sMob){
-        $sMob = [
-            "name" => $sMob["name"],
-            "nature" => $sMob["nature"],
-            "spawning" => $sMob["spawning"],
-            "general_behavior" => $sMob["general_behavior"],
-            "drops" => $sMob["drops"],
-            "variants" => $variants,
-            "version_release" => $sMob["version_release"],
-            "release_date" => $sMob["release_date"],
-            "tags" => $tags
-        ];
+    foreach($variants as &$variant){
+        $variantName = $variant["variant_name"];
+        $variantIdResult = $dbh->query("SELECT mobs.id FROM mobs WHERE mobs.name = '$variantName'");
+        $variantId = $variantIdResult -> fetch(PDO::FETCH_ASSOC);
+        $variant["url"] = "http://$_SERVER[SERVER_NAME]/mineapi/mobs.php?id=" . $variantId['id'];
     }
+
+    $singleMob = [
+        "name" => $singleMob["name"],
+        "nature" => $singleMob["nature"],
+        "spawning" => $singleMob["spawning"],
+        "general_behavior" => $singleMob["general_behavior"],
+        "drops" => $singleMob["drops"],
+        "variants" => $variants,
+        "version_release" => $singleMob["version_release"],
+        "release_date" => $singleMob["release_date"],
+        "tags" => $tags
+    ];
 
     $singleMobObj = new stdClass;
     $singleMobObj = $singleMob;
