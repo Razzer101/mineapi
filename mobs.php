@@ -21,7 +21,7 @@ if($_POST && $headers["x-mineapi-key"] == "050206"){
 
 // Check mob count
 $count = $dbh->query("SELECT count(id) FROM mobs")->fetchColumn();
-
+//&& $_GET["limit"] <= $count
 // Create limit and offset
 if($_GET["limit"]){
     $limit = $_GET["limit"];
@@ -29,7 +29,7 @@ if($_GET["limit"]){
     $limit = 10;
 }
 
-if($_GET["offset"]){
+if($_GET["offset"] && $_GET["offset"] < $count){
     $offset = $_GET["offset"];
 } else {
     $offset = 0;
@@ -43,8 +43,32 @@ foreach($mobs as &$mob){
     $mob["url"] = "http://$_SERVER[SERVER_NAME]/mineapi/mobs.php?id=" . $mob["id"];
 }
 
+if($offset + $limit >= $count){
+    $offsetNext = $count - 1;
+} else {
+    $offsetNext = $offset + $limit;
+}
+
+if($offset - $limit <= 0){
+    $offsetPrev = 0;
+} else {
+    $offsetPrev = $offset - $limit;
+}
+
+if($_GET["limit"]){
+    $nextMobs = "http://$_SERVER[SERVER_NAME]/mineapi/mobs.php?offset=$offsetNext&limit=$limit";
+    $prevMobs = "http://$_SERVER[SERVER_NAME]/mineapi/mobs.php?offset=$offsetPrev&limit=$limit";
+} else{
+    $nextMobs = "http://$_SERVER[SERVER_NAME]/mineapi/mobs.php?offset=$offsetNext";
+    $prevMobs = "http://$_SERVER[SERVER_NAME]/mineapi/mobs.php?offset=$offsetPrev";
+}
+
+
+
 $obj = new stdClass;
 $obj->count = $count;
+$obj->next = $offset == $count - 1 ? null : $nextMobs;
+$obj->prev = $offset == 0 ? null : $prevMobs;
 $obj->results = $mobs;
 
 header("Content-Type:application/json");
