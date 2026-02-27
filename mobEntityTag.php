@@ -16,6 +16,30 @@ if($_POST && $headers["x-mineapi-key"] == "050206"){
     $stmt->execute();
 }
 
+if ($_GET["id"] && $_SERVER['REQUEST_METHOD'] == "PATCH" && $headers["x-mineapi-key"] == "050206") {
+    parse_str(file_get_contents('php://input'), $_PATCH);
+    $patchsql = "UPDATE mob_entity_tag SET ";
+    foreach($_PATCH as $key => $value){
+        $patchsql .= "$key = :$key";
+        if(end($_PATCH) != $value){
+            $patchsql .= ", ";
+        }
+    }
+    $patchsql .= " WHERE id = :id";
+    
+    $stmt = $dbh->prepare($patchsql);
+    $stmt->bindParam("id", $_GET["id"], PDO::PARAM_INT);
+    foreach($_PATCH as $key => $value){
+        if($key == "mob_id"){
+            $stmt->bindParam("$key", $_PATCH["$key"], PDO::PARAM_INT);
+        }
+        if($key == "entity_tag_id"){
+            $stmt->bindParam("$key", $_PATCH["$key"], PDO::PARAM_INT);
+        }
+    }
+    $stmt->execute();
+}
+
 if ($_GET["id"] && $_SERVER['REQUEST_METHOD'] == "DELETE" && $headers["x-mineapi-key"] == "050206") {
     $deletesql = "DELETE FROM mob_entity_tag WHERE id = :id";
     $stmt = $dbh->prepare($deletesql);
