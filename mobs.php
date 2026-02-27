@@ -21,9 +21,8 @@ if($_POST && $headers["x-mineapi-key"] == "050206"){
 
 // Check mob count
 $count = $dbh->query("SELECT count(id) FROM mobs")->fetchColumn();
-//&& $_GET["limit"] <= $count
 // Create limit and offset
-if($_GET["limit"]){
+if($_GET["limit"] && $_GET["limit"] <= $count){
     $limit = $_GET["limit"];
 } else {
     $limit = 10;
@@ -67,7 +66,7 @@ if($_GET["limit"]){
 
 $obj = new stdClass;
 $obj->count = $count;
-$obj->next = $offset == $count - 1 ? null : $nextMobs;
+$obj->next = $offset == $count - 1 || $limit == $count ? null : $nextMobs;
 $obj->prev = $offset == 0 ? null : $prevMobs;
 $obj->results = $mobs;
 
