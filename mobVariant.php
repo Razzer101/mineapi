@@ -23,7 +23,7 @@ if ($_GET["id"] && $_SERVER['REQUEST_METHOD'] == "DELETE" && $headers["x-mineapi
     $stmt->execute();
 }
 
-$mobvariantsResults = $dbh->query("SELECT mob_variant.mob_id, mob_variant.variant_id FROM mob_variant");
+$mobvariantsResults = $dbh->query("SELECT mob_variant.id, mob_variant.mob_id, mob_variant.variant_id FROM mob_variant");
 $mobvariants = $mobvariantsResults->fetchAll(PDO::FETCH_ASSOC);
 
 $obj = new stdClass;
