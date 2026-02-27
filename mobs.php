@@ -15,7 +15,6 @@ if($_POST && $headers["x-mineapi-key"] == "050206"){
     $stmt->bindParam("drops", $_POST["drops"]);
     $stmt->bindParam("version_release", $_POST["version_release"]);
     $stmt->bindParam("release_date", $_POST["release_date"]);
-
     $stmt->execute();
 }
 
@@ -77,16 +76,16 @@ if(!$_GET["id"]){
     // PATCH/edit a mob
     if ($_SERVER['REQUEST_METHOD'] == "PATCH" && $headers["x-mineapi-key"] == "050206") {
         parse_str(file_get_contents('php://input'), $_PATCH);
-        $sql = "UPDATE mobs SET ";
+        $patchsql = "UPDATE mobs SET ";
         foreach($_PATCH as $key => $value){
-            $sql .= "$key = :$key";
+            $patchsql .= "$key = :$key";
             if(end($_PATCH) != $value){
-                $sql .= ", ";
+                $patchsql .= ", ";
             }
         }
-        $sql .= " WHERE id = :id";
+        $patchsql .= " WHERE id = :id";
 
-        $stmt = $dbh->prepare($sql);
+        $stmt = $dbh->prepare($patchsql);
         $stmt->bindParam("id", $_GET["id"], PDO::PARAM_INT);
         foreach($_PATCH as $key => $value){
             if($key == "name"){
@@ -150,8 +149,8 @@ if(!$_GET["id"]){
 
     // DELETE/slet mob
     if ($_SERVER['REQUEST_METHOD'] == "DELETE" && $headers["x-mineapi-key"] == "050206") {
-        $sql = "DELETE FROM mobs WHERE id = :id";
-        $stmt = $dbh->prepare($sql);
+        $deletesql = "DELETE FROM mobs WHERE id = :id";
+        $stmt = $dbh->prepare($deletesql);
         $stmt->bindParam("id", $_GET["id"], PDO::PARAM_INT);
         $stmt->execute();
     }

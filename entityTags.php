@@ -10,7 +10,6 @@ if($headers["x-mineapi-key"] != "050206"){
 
 if($_POST && $headers["x-mineapi-key"] == "050206"){
     $postsql = "INSERT INTO entity_tags (tag, info) VALUES(:tag, :info)";
-
     $stmt = $dbh->prepare($postsql);
     $stmt->bindParam("tag", $_POST["tag"]);
     $stmt->bindParam("info", $_POST["info"]);
@@ -18,8 +17,8 @@ if($_POST && $headers["x-mineapi-key"] == "050206"){
 }
 
 if ($_GET["id"] && $_SERVER['REQUEST_METHOD'] == "DELETE" && $headers["x-mineapi-key"] == "050206") {
-    $sql = "DELETE FROM entity_tags WHERE id = :id";
-    $stmt = $dbh->prepare($sql);
+    $deletesql = "DELETE FROM entity_tags WHERE id = :id";
+    $stmt = $dbh->prepare($deletesql);
     $stmt->bindParam("id", $_GET["id"], PDO::PARAM_INT);
     $stmt->execute();
 }
