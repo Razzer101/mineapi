@@ -3,6 +3,11 @@
 $headers = apache_request_headers();
 require_once("./db.php");
 
+if($headers["x-mineapi-key"] != "050206"){
+    header("Location: ./");
+    exit();
+}
+
 if($_POST && $headers["x-mineapi-key"] == "050206"){
     $sql = "INSERT INTO mob_entity_tag (mob_id, entity_tag_id) VALUES(:mob_id, :entity_tag_id)";
     $stmt = $dbh->prepare($sql);

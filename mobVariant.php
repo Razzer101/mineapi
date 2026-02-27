@@ -3,6 +3,11 @@
 $headers = apache_request_headers();
 require_once("./db.php");
 
+if($headers["x-mineapi-key"] != "050206"){
+    header("Location: ./");
+    exit();
+}
+
 if($_POST && $headers["x-mineapi-key"] == "050206"){
     $sql = "INSERT INTO mob_variant (mob_id, variant_id) VALUES(:mob_id, :variant_id)";
     $stmt = $dbh->prepare($sql);
